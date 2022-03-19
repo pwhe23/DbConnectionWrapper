@@ -1,20 +1,73 @@
 ﻿namespace DbConnectionWrapper;
 using System.Data;
+using System.Text;
+using Microsoft.Data.SqlClient;
 
 public class ActionDbCommand : WrappedDbCommand
 {
-    private readonly Action<string?>? _action;
+    private readonly Action<string?> _action;
 
     public ActionDbCommand(IDbCommand cmd, Action<string?>? action = null) : base(cmd)
     {
-        _action = action;
+        _action = action ?? (_ => { });
     }
 
     protected override T Execute<T>(Func<T> func)
     {
-        _action?.Invoke(CommandText);
+        var sb = new StringBuilder();
+        SqlParameter? returnValue = null;
+        foreach (SqlParameter param in Parameters)
+        {
+            if (param.Direction == ParameterDirection.ReturnValue)
+            {
+                returnValue = param;
+            }
+            sb.AppendLine(FormatParameter(param));
+        }
+        if (CommandType == CommandType.StoredProcedure && returnValue == null)
+        {
+            sb.AppendLine($"EXEC {CommandText}");
+        }
+        else if (CommandType == CommandType.StoredProcedure && returnValue != null)
+        {
+            sb.AppendLine($"EXEC @{returnValue.ParameterName} = {CommandText}");
+        }
+        else
+        {
+            sb.AppendLine(CommandText);
+        }
+        _action(sb.ToString());
+
         var result = base.Execute(func);
+
+        sb = new();
+        foreach (SqlParameter param in Parameters)
+        {
+            if (param.Direction == ParameterDirection.Output || param.Direction == ParameterDirection.ReturnValue)
+            {
+                sb.AppendLine($"SELECT @{param.ParameterName} AS [{param.ParameterName}]");
+            }
+        }
+        _action(sb.ToString());
+
         return result;
+    }
+
+    private static string FormatParameter(SqlParameter param)
+    {
+        var format = param.SqlDbType switch
+        {
+            SqlDbType.NVarChar => "DECLARE @{0} {1}({2}) = {3}",
+            SqlDbType.VarChar => "DECLARE @{0} {1}({2}) = {3}",
+            _ => "DECLARE @{0} {1} = {3}"
+        };
+
+        return string.Format(format,
+            param.ParameterName,
+            param.SqlDbType,
+            param.Size == 0 ? 1 : param.Size,
+            param.Value is DBNull ? "NULL" : "'" + param.Value + "'"
+        );
     }
 };
 
@@ -34,7 +87,7 @@ public class WrappedDbConnection : IDbConnection
     public virtual string Database => _conn.Database;
     public virtual ConnectionState State => _conn.State;
     public virtual IDbTransaction BeginTransaction() => _conn.BeginTransaction();
-    public virtual IDbTransaction BeginTransaction(System.Data.IsolationLevel il) => _conn.BeginTransaction(il);
+    public virtual IDbTransaction BeginTransaction(IsolationLevel il) => _conn.BeginTransaction(il);
     public virtual void ChangeDatabase(string databaseName) => _conn.ChangeDatabase(databaseName);
     public virtual void Open() => _conn.Open();
     public virtual void Close() => _conn.Close();
