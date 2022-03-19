@@ -12,5 +12,5 @@ using var conn = new WrappedDbConnection(
 );
 
 // #r "nuget: Dapper"
-conn.Query("SELECT * FROM [Table]").Dump();
+var rows = conn.Query("SELECT * FROM [Table]");
 ```
