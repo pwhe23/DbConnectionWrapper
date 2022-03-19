@@ -4,6 +4,8 @@ A simple wrapper for IDbConnection that allows logging SQL statements and works 
 
 It has support for Stored Procedures, Functions, and Table-Valued Functions and formats the logs such that they can be directly run in SSMS which is extremely useful for debugging.
 
+All the code is in the `DbConnectionWrapper.cs` class, but I'm working on adding a Nuget package.
+
 ## Usage
 
 ``` C#
