@@ -1,4 +1,4 @@
-﻿namespace DbConnectionWrapper;
+﻿namespace Tagovi.DbConnectionWrapper;
 using System.Data;
 using System.Text;
 using Microsoft.Data.SqlClient;

@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<PackageId>Tagovi.DbConnectionWrapper</PackageId>
+        <PackageDescription>A simple wrapper for IDbConnection that allows logging SQL statements and works easily with Dapper or anything where you can pass the IDbConnection you want to use.
+
+It has support for Stored Procedures, Functions, and Table-Valued Functions and formats the logs such that they can be directly run in SSMS which is extremely useful for debugging.</PackageDescription>
+        <PackageVersion>0.1.4</PackageVersion>
+		<Authors>Tagovi</Authors>
+		<Company>Tagovi</Company>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageProjectUrl>https://github.com/pwhe23/DbConnectionWrapper</PackageProjectUrl>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="4.1.0" />
+		<PackageReference Include="System.Data.Common" Version="4.3.0" />
+	</ItemGroup>
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+</Project>

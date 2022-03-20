@@ -10,9 +10,9 @@ All the code is in the `DbConnectionWrapper.cs` class, but I'm working on adding
 
 ``` C#
 // #r "nuget: Dapper"
-// #r "nuget: System.Data.SqlClient"
+// #r "nuget: Microsoft.Data.SqlClient"
 using var conn = new WrappedDbConnection(
-    new SqlConnection(@"Server=.\SqlExpress;Database=Database;Integrated Security=SSPI"), 
+    new SqlConnection(@"Server=.\SqlExpress;Database=BogusLocal;Integrated Security=SSPI;TrustServerCertificate=True;"), 
     x => new ActionDbCommand(x, Console.WriteLine)
 );
 
